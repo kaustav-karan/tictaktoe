@@ -4,7 +4,9 @@ import Square from './Component/Square';
 import { Patterns } from './Patterns';
 
 function App() {
-  const [mat, setMat] = useState(["", "", "", "", "", "", "", "", ""]);
+  const [board, setBoard] = useState(
+    JSON.parse(localStorage.getItem('board')) || ["", "", "", "", "", "", "", "", ""]
+  );
   const [player, setPlayer] = useState("O");
   const [result, setResult] = useState({ winner: "none", state: "none" });
 
@@ -18,7 +20,7 @@ function App() {
       setPlayer("X");
     }
     // eslint-disable-next-line
-  }, [mat]);
+  }, [board]);
 
   useEffect(() => {
     if (result.state !== "none") {
@@ -27,9 +29,13 @@ function App() {
     }
   }, [result]);
 
+  useEffect(() => {
+    localStorage.setItem('board', JSON.stringify(board));
+  }, [board]);
+
   const chooseSquare = (square) => {
-    setMat(
-      mat.map((val, idx) => {
+    setBoard(
+      board.map((val, idx) => {
         if (idx === square && val === "") {
           return player;
         }
@@ -40,13 +46,13 @@ function App() {
 
   const checkWin = () => {
     Patterns.forEach((currentPattern) => {
-      const firstPlayer = mat[currentPattern[0]];
+      const firstPlayer = board[currentPattern[0]];
 
       if (firstPlayer === "") return;
 
       let foundWinninPattern = true;
       currentPattern.forEach((idx) => {
-        if (mat[idx] !== firstPlayer) {
+        if (board[idx] !== firstPlayer) {
           foundWinninPattern = false;
         }
       });
@@ -58,40 +64,40 @@ function App() {
 
   const checkIfTie = () => {
     let filled = true;
-    mat.forEach((square) => {
+    board.forEach((square) => {
       if (square === "") {
         filled = false;
       }
     })
     if (filled) {
       setResult({ winner: "No one", state: "Tie" });
-
     }
   }
 
   const resetGame = () => {
-    setMat(["", "", "", "", "", "", "", "", ""]);
+    setBoard(["", "", "", "", "", "", "", "", ""]);
     setPlayer("O");
     setResult({ winner: "none", state: "none" });
+    localStorage.removeItem('board');
   }
 
   return (
     <div className="App">
-      <div className="mat">
+      <div className="board">
         <div className="row">
-          <Square val={mat[0]} chooseSquare={() => { chooseSquare(0); }} />
-          <Square val={mat[1]} chooseSquare={() => { chooseSquare(1); }} />
-          <Square val={mat[2]} chooseSquare={() => { chooseSquare(2); }} />
+          <Square val={board[0]} chooseSquare={() => { chooseSquare(0); }} />
+          <Square val={board[1]} chooseSquare={() => { chooseSquare(1); }} />
+          <Square val={board[2]} chooseSquare={() => { chooseSquare(2); }} />
         </div>
         <div className="row">
-          <Square val={mat[3]} chooseSquare={() => { chooseSquare(3); }} />
-          <Square val={mat[4]} chooseSquare={() => { chooseSquare(4); }} />
-          <Square val={mat[5]} chooseSquare={() => { chooseSquare(5); }} />
+          <Square val={board[3]} chooseSquare={() => { chooseSquare(3); }} />
+          <Square val={board[4]} chooseSquare={() => { chooseSquare(4); }} />
+          <Square val={board[5]} chooseSquare={() => { chooseSquare(5); }} />
         </div>
         <div className="row">
-          <Square val={mat[6]} chooseSquare={() => { chooseSquare(6); }} />
-          <Square val={mat[7]} chooseSquare={() => { chooseSquare(7); }} />
-          <Square val={mat[8]} chooseSquare={() => { chooseSquare(8); }} />
+          <Square val={board[6]} chooseSquare={() => { chooseSquare(6); }} />
+          <Square val={board[7]} chooseSquare={() => { chooseSquare(7); }} />
+          <Square val={board[8]} chooseSquare={() => { chooseSquare(8); }} />
         </div>
       </div>
     </div>
